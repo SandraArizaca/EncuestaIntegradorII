@@ -1,0 +1,112 @@
+﻿@using encuesta.Models
+@{
+    Layout = null;
+}
+<script>
+    $(document).ready(function () {
+
+    });
+</script>
+
+<div role="form">
+    <input type="hidden" id="ID_Cuestionario" name="ID_Cuestionario" value="@ViewBag.ID_Cuestionario">
+    <input type="hidden" id="isEdit" name="isEdit" value="1">
+    <input type="hidden" id="isDelete" name="isDelete" value="0">
+    <div class="form-group">
+        <label for="C_Cuestionario">Título</label>
+        <textarea class="form-control" id="C_Cuestionario" name="C_Cuestionario" rows="2" data-validation="required">@ViewBag.C_Cuestionario</textarea>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label for="N_Area">Area</label>
+                <select class="form-control" id="N_Area" name="N_Area">
+                    @if (TempData.ContainsKey("Area"))
+                    {
+                        var ListaArea = TempData["Area"] as List<T_Area>;
+                        foreach (var item in ListaArea)
+                        {
+                            if (@item.ID_Area == @ViewBag.N_Area)
+                            {
+                                <option value=@item.ID_Area selected>@item.C_Area</option>
+                            }
+                            else
+                            {
+                                <option value=@item.ID_Area>@item.C_Area</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="N_Publico">Público Objetivo</label>
+                <select class="form-control" id="N_Publico" name="N_Publico">
+                    @if (TempData.ContainsKey("Publico"))
+                    {
+                        var ListaPublico = TempData["Publico"] as List<T_Publico>;
+                        foreach (var item in ListaPublico)
+                        {
+                            if (@item.ID_Publico == @ViewBag.N_Publico)
+                            {
+                                <option value=@item.ID_Publico selected>@item.C_Publico</option>
+                            }
+                            else
+                            {
+                                <option value=@item.ID_Publico>@item.C_Publico</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label for="C_Ano">Año</label>
+                <input type="text" class="form-control text-right" id="C_Ano" name="C_Ano" value='@ViewBag.C_Ano' data-validation="required" onkeypress="return soloNumeros(event)">
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label for="D_Inicio">Inicio</label>
+                <input type="date" class="form-control" id="D_Inicio" name="D_Inicio" value='@ViewBag.D_Inicio.Date.ToString("yyyy-MM-dd")' data-validation="required">
+
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label for="D_Final">Final</label>
+                <input type="date" class="form-control" id="D_Final" name="D_Final" value='@ViewBag.D_Final.Date.ToString("yyyy-MM-dd")' data-validation="required">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label for="N_Preguntas">Número de Preguntas</label>
+                <input type="text" class="form-control text-right" id="N_Preguntas" name="N_Preguntas" value='@ViewBag.N_Preguntas' data-validation="required" onkeypress="return soloNumeros(event)" disabled="disabled">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label for="C_Estado">Estado</label>
+                <input type="text" class="form-control text-right" id="C_Estado" name="C_Estado" value='@ViewBag.C_Estado' disabled="disabled">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="C_Presentacion">Presentación</label>
+        <textarea class="form-control" id="C_Presentacion" name="C_Presentacion" rows="2">@ViewBag.C_Presentacion</textarea>
+    </div>
+    <div class="form-group">
+        <label for="C_Resumen">Resumen</label>
+        <textarea class="form-control" id="C_Resumen" name="C_Resumen" rows="2">@ViewBag.C_Resumen</textarea>
+    </div>
+    @*<div class="form-group">
+            <label for="C_Mensaje">Mensaje Final</label>
+            <textarea class="form-control" id="C_Mensaje" name="C_Mensaje" rows="2" data-validation="required">@ViewBag.C_Mensaje</textarea>
+        </div>*@
+    <div class="form-group">
+        <label for="C_CorreoRemitente">Correo Remitente</label>
+        <input type="email" class="form-control" id="C_CorreoRemitente" name="C_CorreoRemitente" value="@ViewBag.C_CorreoRemitente" placeholder="example@dominio.ex" pattern="[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*\u0040[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{1,5}">
+    </div>
+</div>

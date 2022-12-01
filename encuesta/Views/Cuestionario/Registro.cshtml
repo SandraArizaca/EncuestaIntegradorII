@@ -1,0 +1,337 @@
+﻿@model IEnumerable<encuesta.Models.T_Cuestionario>
+
+<link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.bootstrap.min.css" />
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Content/js/bootstrap.min.js"></script>
+<script src="~/Scripts/jquery.form-validator.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.validate();
+        $('#tbl').DataTable({
+            responsive: true,
+            "lengthMenu": [[20, 40, -1], [20, 40, "All"]],
+            order: [[0, 'desc']]
+        });
+
+        $("#btn_nuevo").click(function () {
+            $("#mAjax").show();
+            $("#m_new").load("/Cuestionario/Registro_new", {}, function (data) {
+                $("#mAjax").hide();
+                $('#mod_new').modal('show');
+            });
+        });
+
+        $("#btn_cancelar").click(function () {
+            $("#mod_delete").modal('hide');
+        });
+
+        $("#mod_new").on("shown.bs.modal", function () {
+            $("#mAjax").hide();
+        });
+    });
+</script>
+
+<style type=text/css>
+    .m_nb {
+        font-weight: normal;
+    }
+
+    .m_boton {
+        width: 24px;
+        height: 24px;
+        background-color: #03800b;
+        margin: 5px;
+        padding: 1px;
+        -webkit-border-radius: 50px;
+        -moz-border-radius: 50px;
+        border-radius: 50px;
+        font-size: 11px;
+        line-height: 24px;
+        text-transform: uppercase;
+        float: left;
+    }
+
+        .m_boton:hover {
+            opacity: 0.50;
+            -moz-opacity: .50;
+            filter: alpha (opacity=50);
+        }
+
+        .m_boton label {
+            font-size: 16px;
+            color: #fff;
+            padding: 0 0 0 6px;
+            cursor: pointer;
+        }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="panel-title" style="padding-top:10px;">Registro de Cuestionario</h2>
+            </div>
+            <div class="col-md-6 text-right">
+                <img id="mAjax" name="mAjax" src="~/Img/ajax-loader-crud.gif" style="display:none;" />&nbsp;&nbsp;
+                @if (TempData.Peek("Usuario").ToString().ToUpper() != "MULTIENCUESTADAMER")
+                {
+                    <button type="button" id="btn_nuevo" name="btn_nuevo" class="btn btn-primary btn-sm">
+                        <i class="glyphicon glyphicon-new-window"></i> Nuevo Cuestionario
+                    </button>
+                }
+                </div>
+        </div>
+    </div>
+    <div class="panel-body container-fluid">
+        <table id="tbl" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width:60px;" hidden>ITEM</th>
+                    <th>Cuestionario</th>
+                    <th>Area</th>
+                    <th>Público Objetivo</th>
+                    <th class="text-center" style="width:100px;">Inicio</th>
+                    <th class="text-center" style="width:100px;">Final</th>
+                    <th class="text-center" style="width:100px;">Estado</th>
+                    @if (TempData.Peek("Usuario").ToString().ToUpper() != "MULTIENCUESTADAMER")
+                    {
+                        <th class="text-center">Modificar</th>
+                        <th class="text-center">Anular</th>
+                        <th class="text-center">Secciones</th>
+                        <th class="text-center">Preguntas</th>
+                    }
+                        <th class="text-center">Vista Previa</th>
+                    </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td scope="row" class="text-center" hidden>
+                        @Html.DisplayFor(modelItem => item.ID_Cuestionario)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.C_Cuestionario)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.T_Area.C_Area)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.T_Publico.C_Publico)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.D_FechaInicio)
+                    </td>
+                    <td class="text-center">
+                        @Html.DisplayFor(modelItem => item.D_FechaFinal)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.T_Estado.C_Estado)
+                    </td>
+                    @if (TempData.Peek("Usuario").ToString().ToUpper() != "MULTIENCUESTADAMER")
+                    {
+                        <td class="text-center" style="width:100px;">
+                            <a href="#" onclick="load_edit('@Html.DisplayFor(modelItem => item.ID_Cuestionario)');">Modificar</a>
+                        </td>
+                        <td class="text-center" style="width:100px;">
+                            <a href="#" onclick="load_delete('@Html.DisplayFor(modelItem => item.ID_Cuestionario)');">Anular</a>
+                        </td>
+                        <td class="text-center" style="width:100px;">
+                            <a href="#" onclick="load_secciones('@Html.DisplayFor(modelItem => item.ID_Cuestionario)');">Secciones</a>
+                        </td>
+                        <td class="text-center" style="width:100px;">
+                            <a href="#" onclick="load_preguntas('@Html.DisplayFor(modelItem => item.ID_Cuestionario)');">Preguntas</a>
+                        </td>
+                    }
+                        <td class="text-center" style="width:100px;">
+                            <a href="/Encuesta/VistaPrevia?nCuestionario=@Html.DisplayFor(modelItem => item.ID_Cuestionario)" target="_blank">Vista Previa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* modal: agregar*@
+@using (Html.BeginForm("Registro", "Cuestionario", FormMethod.Post, new { id = "mform" }))
+{
+    <div class="modal fade" id="mod_new" name="mod_new" tabindex="-1" role="dialog" aria-labelledby="mod_new" aria-hidden="true" data-keyboard=”false”>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <!---->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Nuevo</h4>
+                </div>
+                <!---->
+                <div class="modal-body">
+                    <div id="m_new">
+
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <button type="submit" id="btn_new" class="btn btn-primary">Registrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@* modal: modificar*@
+@using (Html.BeginForm("Registro", "Cuestionario", FormMethod.Post, new { id = "mform" }))
+{
+    <div class="modal fade" id="mod_edit" name="mod_edit" tabindex="-1" role="dialog" aria-labelledby="mod_edit" aria-hidden="true" data-keyboard=”false”>
+        <div class="modal-dialog" role="document" style="overflow-y: initial !important">
+            <div class="modal-content">
+                <!---->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Modificar</h4>
+                </div>
+                <!---->
+                <div class="modal-body" style="height: 550px; overflow-y: auto;">
+                    <div id="m_edit">
+
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <button type="submit" id="btn_update" class="btn btn-primary">Registrar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* modal: eliminar*@
+@using (Html.BeginForm("Registro", "Cuestionario", FormMethod.Post, new { id = "mform" }))
+{
+    <div class="modal fade" id="mod_delete" name="mod_delete" tabindex="-1" role="dialog" aria-labelledby="mod_delete" aria-hidden="true" data-keyboard=”false”>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <!---->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Anular</h4>
+                </div>
+                <!---->
+                <div class="modal-body">
+                    <div id="m_delete">
+
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <button type="button" id="btn_cancelar" class="btn">Cancelar</button>
+                        <button type="submit" id="btn_delete" class="btn btn-primary">Anular</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="mod_seccion" name="mod_seccion" tabindex="-1" role="dialog" aria-labelledby="mod_seccion" aria-hidden="true" data-keyboard=”false”>
+    <div class="modal-dialog" role="document" style="width: 1000px; overflow-y: initial !important">
+        <div class="modal-content">
+            <!---->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Asignar Secciones</h4>
+            </div>
+            <!---->
+            <div class="modal-body" style="height: 550px; overflow-y: auto;">
+                <div id="m_seccion">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mod_pregunta" name="mod_pregunta" tabindex="-1" role="dialog" aria-labelledby="mod_pregunta" aria-hidden="true" data-keyboard=”false”>
+    <div class="modal-dialog" role="document" style="width: 1000px; overflow-y: initial !important">
+        <div class="modal-content">
+            <!---->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Asignar Preguntas</h4>
+            </div>
+            <!---->
+            <div class="modal-body" style="height: 550px; overflow-y: auto;">
+                <div id="m_pregunta">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function load_edit(nID) {
+        $("#mAjax").show();
+        $("#m_edit").load("/Cuestionario/Registro_edit", { ID_Cuestionario: nID }, function (data) {
+            $("#mAjax").hide();
+            $('#mod_edit').modal('show');
+        });
+    };
+
+    function load_delete(nID) {
+        /*debugger;*/
+        $("#mAjax").show();
+        $("#m_delete").load("/Cuestionario/Registro_delete", { ID_Cuestionario: nID }, function (data) {
+            $("#mAjax").hide();
+            $('#mod_delete').modal('show');
+        });
+    };
+
+    function load_secciones(nID) {
+        $("#mAjax").show();
+        $("#m_seccion").load("/Cuestionario/Registro_seccion", { ID_Cuestionario: nID }, function (data) {
+            $("#mAjax").hide();
+            $('#mod_seccion').modal('show');
+        });
+    };
+
+    function load_preguntas(nID) {
+        $("#mAjax").show();
+        $("#m_pregunta").load("/Cuestionario/Registro_pregunta", { ID_Cuestionario: nID }, function (data) {
+            $("#mAjax").hide();
+            $('#mod_pregunta').modal('show');
+        });
+    };
+
+    function soloNumeros(e) {
+        var key = window.Event ? e.which : e.keyCode
+        return ((key >= 48 && key <= 57) || (key == 8))
+        }
+</script>

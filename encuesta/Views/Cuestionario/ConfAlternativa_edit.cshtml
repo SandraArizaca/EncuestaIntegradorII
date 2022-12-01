@@ -1,0 +1,249 @@
+﻿@using encuesta.Models
+@{
+    Layout = null;
+}
+<script>
+    $(document).ready(function () {
+        /*debugger;*/
+        var altCom = @ViewBag.N_AltComentario;
+        var altSec = @ViewBag.N_AltSecuencia;
+
+        $('#ComObliga2').hide();
+        $('#Secuencia2').hide();
+
+        if (altCom == 1) {
+            $('#ComObliga2').show();
+        }
+
+        if (altSec == 1) {
+            $('#Secuencia2').show();
+        }
+
+        $('#nFinalizaEncuesta2').change(function () {
+            if (this.checked) {
+                $("#N_FinalizaEncuesta").val(true);
+            } else {
+                $("#N_FinalizaEncuesta").val(false);
+            }
+        });
+
+        $('#nIncluyeComentario2').change(function () {
+            if (this.checked) {
+                $("#N_AltComentario").val(1);
+                $('#ComObliga2').show();
+            } else {
+                $("#N_AltComentario").val(0);
+                $('#ComObliga2').hide();
+            }
+        });
+
+        $('#nComentarioObligatorio2').change(function () {
+            if (this.checked) {
+                $("#N_AltComentarioObligatorio").val(true);
+            } else {
+                $("#N_AltComentarioObligatorio").val(false);
+            }
+        });
+
+        $('#nTieneSecuencia2').change(function () {
+            if (this.checked) {
+                $("#N_AltSecuencia").val(1);
+                $('#Secuencia2').show();
+            } else {
+                $("#N_AltSecuencia").val(0);
+                $('#Secuencia2').hide();
+            }
+        });
+
+        $('#nEmisionBoleto2').change(function () {
+            if (this.checked) {
+                $("#N_AltEmisionBoleto").val(true);
+            } else {
+                $("#N_AltEmisionBoleto").val(false);
+            }
+        });
+       
+    });
+</script>
+
+<div role="form">
+    <input type="hidden" id="ID_Pregunta" name="ID_Pregunta" value="@ViewBag.ID_Pregunta">
+    <input type="hidden" id="ID_Alternativa" name="ID_Alternativa" value="@ViewBag.ID_Alternativa">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="C_Pregunta">Pregunta: @ViewBag.C_Pregunta</label>
+                <label for="C_Alternativa">Alternativa: @ViewBag.C_Alternativa</label>
+                <input type="hidden" id="N_Cuestionario" name="N_Cuestionario" value="@ViewBag.ID_Cuestionario">
+                <input type="hidden" id="ID_Seccion" name="ID_Seccion" value="@ViewBag.ID_Seccion">
+                <input type="hidden" id="N_FinalizaEncuesta" name="N_FinalizaEncuesta" value="@ViewBag.N_FinalizaEncuesta">
+                <input type="hidden" id="N_AltComentario" name="N_AltComentario" value="@ViewBag.N_AltComentario">
+                <input type="hidden" id="N_AltComentarioObligatorio" name="N_AltComentarioObligatorio" value="@ViewBag.N_AltComentarioObligatorio">
+                <input type="hidden" id="N_AltSecuencia" name="N_AltSecuencia" value="@ViewBag.N_AltSecuencia">
+                <input type="hidden" id="C_ComentarioEscala" name="C_ComentarioEscala" value="@ViewBag.C_ComentarioEscala">
+                <input type="hidden" id="C_ComentariOblgEscala" name="C_ComentariOblgEscala" value="@ViewBag.C_ComentariOblgEscala">
+                <input type="hidden" id="N_AltEmisionBoleto" name="N_AltEmisionBoleto" value="@ViewBag.N_AltEmisionBoleto">
+            </div>
+        </div>
+    </div>
+    <hr style="padding-top:0px;margin-top:0px;" />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-check">
+                @if (ViewBag.N_FinalizaEncuesta == true)
+                {
+                    <input type="checkbox" class="form-check-input" id="nFinalizaEncuesta2" name="nFinalizaEncuesta2" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nFinalizaEncuesta2" name="nFinalizaEncuesta2" value=false>
+                }
+
+                <label class="form-check-label" for="nFinalizaEncuesta2" style="font-weight:normal;">Finaliza Encuesta?</label>
+            </div>
+        </div>
+        @if (ViewBag.ID_TipoLikert == null)
+        {
+            <div class="col-md-4">
+                <div class="form-check">
+                    @if (ViewBag.N_AltComentario == 1)
+                    {
+                        <input type="checkbox" class="form-check-input" id="nIncluyeComentario2" name="nIncluyeComentario2" checked value=true>
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="form-check-input" id="nIncluyeComentario2" name="nIncluyeComentario2" value=false>
+                    }
+
+                    <label class="form-check-label" for="nIncluyeComentario2" style="font-weight:normal;">Ingresa comentario?</label>
+                </div>
+            </div>
+            <div class="col-md-4" id="ComObliga2">
+                <div class="form-check">
+                    @if (ViewBag.N_AltComentarioObligatorio == true)
+                    {
+                        <input type="checkbox" class="form-check-input" id="nComentarioObligatorio2" name="nComentarioObligatorio2" checked value=true>
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="form-check-input" id="nComentarioObligatorio2" name="nComentarioObligatorio2" value=false>
+                    }
+                    <label class="form-check-label" for="nComentarioObligatorio2" style="font-weight:normal;">Comentario Obligatorio?</label>
+                </div>
+            </div>
+        }
+            <div class="col-md-4">
+                <div class="form-check">
+                    @if (ViewBag.N_AltEmisionBoleto == 1)
+                    {
+                        <input type="checkbox" class="form-check-input" id="nEmisionBoleto2" name="nEmisionBoleto2" checked value=true>
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="form-check-input" id="nEmisionBoleto2" name="nEmisionBoleto2" value=false>
+                    }
+
+                    <label class="form-check-label" for="nEmisionBoleto2" style="font-weight:normal;">Incluye Preguntas Emisión Boletos?</label>
+                </div>
+            </div>
+            @if (ViewBag.ID_TipoLikert == null)
+            {
+                <div class="col-md-4">
+                    <div class="form-check">
+                        @if (ViewBag.N_AltSecuencia == 1)
+                        {
+                            <input type="checkbox" class="form-check-input" id="nTieneSecuencia2" name="nTieneSecuencia2" checked value=true>
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="form-check-input" id="nTieneSecuencia2" name="nTieneSecuencia2" value=false>
+                        }
+                        <label class="form-check-label" for="nTieneSecuencia2" style="font-weight:normal;">Ingresa Secuencia?</label>
+                    </div>
+                </div>
+            }
+            <div class="col-md-4 form-inline">
+
+            </div>
+        </div>
+    <br />
+    <div class="row" id="Secuencia2">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label for="N_AltPregAnterior" style="font-weight:normal;">Al seleccionar atrás ir a la pregunta: &nbsp;&nbsp;</label>
+                <input type="text" class="form-control" id="N_AltPregAnterior" name="N_AltPregAnterior" value='@ViewBag.N_AltPregAnterior'>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                <label for="N_AltPregSiguiente" style="font-weight:normal;">Al seleccionar siguiente ir a la pregunta: &nbsp;&nbsp;</label>
+                <input type="text" class="form-control" id="N_AltPregSiguiente" name="N_AltPregSiguiente" value='@ViewBag.N_AltPregSiguiente'>
+            </div>
+        </div>
+    </div>
+    @if (ViewBag.ID_TipoLikert != null)
+    {
+    <table id="tbl" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center m_nb" style="width:100px;">Intervalo</th>
+                <th class="m_nb">Valores</th>
+                <th class="m_nb">Incluye Comentario</th>
+                <th class="m_nb">Comentario Obligatorio</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.T_ConfigAlternativaEscala as List<T_ConfigAlternativaEscala>)
+            {
+            <tr>
+                <td class="text-center">
+                    @item.T_Escala.N_Intervalo
+                </td>
+                <td>
+                    @item.T_Escala.C_Escala
+                </td>
+                <td>
+                    <input type="checkbox" class="form-check-input" id="@item.ID_Escala" name="nIncluyeComentarioE" checked=@item.N_Comentario value=@item.N_Comentario onchange ="ObtenerComentarioEscala(this);">
+                </td>
+                <td>
+                    <input type="checkbox" class="form-check-input" id="@item.ID_Escala" name="nComentarioObligatorioE" checked=@item.N_ComentarioObligatorio value=@item.N_ComentarioObligatorio onchange="ObtenerComentariOblgEscala(this);">
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
+    </div>
+<script>
+    var comentarioEscala = "";
+    var comentariOblgEscala = "";
+    function ObtenerComentarioEscala($this) {
+        /*debugger;*/
+        var id = $this.id;
+        var val = $this.checked;
+        var index1 = comentarioEscala.indexOf(id, 0);
+        if (index1 != -1) {
+            var index2 = comentarioEscala.indexOf(',', index1) + 1;
+            var cad = comentarioEscala.substring(index1,index2);
+            comentarioEscala = comentarioEscala.replace(cad, id + ':' + val + ',');
+        } else {
+            comentarioEscala = comentarioEscala + id + ':' + val + ',';
+        }
+        $('#C_ComentarioEscala').val(comentarioEscala);
+    }
+
+    function ObtenerComentariOblgEscala($this) {
+        /*debugger;*/
+        var id = $this.id;
+        var val = $this.checked;
+        var index1 = comentariOblgEscala.indexOf(id, 0);
+        if (index1 != -1) {
+            var index2 = comentariOblgEscala.indexOf(',', index1) + 1;
+            var cad = comentariOblgEscala.substring(index1, index2);
+            comentariOblgEscala = comentariOblgEscala.replace(cad, id + ':' + val + ',');
+        } else {
+            comentariOblgEscala = comentariOblgEscala + id + ':' + val + ',';
+        }
+        $('#C_ComentariOblgEscala').val(comentariOblgEscala);
+    }
+</script>

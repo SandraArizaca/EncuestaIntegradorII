@@ -1,0 +1,220 @@
+﻿@using encuesta.Models
+@{
+    Layout = null;
+}
+<script>
+    $(document).ready(function () {
+        /*debugger;*/
+        var pregCom = @ViewBag.N_PregComentario;
+        var pregSec = @ViewBag.N_PregSecuencia;
+
+        $('#ComObliga').hide();
+        $('#Secuencia').hide();
+
+        if (pregCom == 1) {
+            $('#ComObliga').show();
+        }
+
+        if (pregSec == 1) {
+            $('#Secuencia').show();
+        }
+
+        $('#nEsEmisionBoleto').change(function () {
+            if (this.checked) {
+                $("#N_PregEmisionBoleto").val(true);
+                $("#N_PregNoIncluyeEmisionBoleto").val(false);
+            } else {
+                $("#N_PregEmisionBoleto").val(false);
+            }
+        });
+        $('#nFinalizaEncuesta').change(function () {
+            if (this.checked) {
+                $("#N_FinalizaEncuesta").val(true);
+            } else {
+                $("#N_FinalizaEncuesta").val(false);
+            }
+        });
+        $('#nNoIncluyeEmisionBoleto').change(function () {
+            if (this.checked) {
+                $("#N_PregNoIncluyeEmisionBoleto").val(true);
+                $("#N_PregEmisionBoleto").val(false);
+            } else {
+                $("#N_PregNoIncluyeEmisionBoleto").val(false);
+            }
+        });
+        $('#nIncluyeComentario').change(function () {
+            if (this.checked) {
+                $("#N_PregComentario").val(true);
+                $('#ComObliga').show();
+            } else {
+                $("#N_PregComentario").val(false);
+                $('#ComObliga').hide();
+            }
+        });
+        $('#nComentarioObligatorio').change(function () {
+            if (this.checked) {
+                $("#N_PregComentarioObligatorio").val(true);
+            } else {
+                $("#N_PregComentarioObligatorio").val(false);
+            }
+        });
+        $('#nTieneSecuencia').change(function () {
+            /*debugger;*/
+            if (this.checked) {
+                $("#N_PregSecuencia").val(true);
+                $('#Secuencia').show();
+            } else {
+                $("#N_PregSecuencia").val(false);
+                $('#Secuencia').hide();
+            }
+        });
+        $("#cbo_TipoLikert").on("change", function () {
+            /*debugger;*/
+            nTipoLikert = $("#cbo_TipoLikert").val();
+            $("#ID_TipoLikert").val(nTipoLikert);
+        });
+    });
+</script>
+
+<div role="form">
+    <input type="hidden" id="ID_Seccion" name="ID_Seccion" value="@ViewBag.ID_Seccion">
+    <input type="hidden" id="ID_Pregunta" name="ID_Pregunta" value="@ViewBag.ID_Pregunta">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="C_Seccion">Sección: @ViewBag.C_Seccion</label><br />
+                <label for="C_Pregunta">Pregunta: @ViewBag.C_Pregunta</label>
+                <label for="C_Pregunta">Tipo de Pregunta: @ViewBag.C_TipoPregunta</label>
+                <input type="hidden" id="N_Cuestionario" name="N_Cuestionario" value="@ViewBag.ID_Cuestionario">
+                <input type="hidden" id="ID_TipoLikert" name="ID_TipoLikert" value="@ViewBag.ID_TipoLikert">
+                <input type="hidden" id="N_PregEmisionBoleto" name="N_PregEmisionBoleto" value="@ViewBag.N_PregEmisionBoleto">
+                <input type="hidden" id="N_FinalizaEncuesta" name="N_FinalizaEncuesta" value="@ViewBag.N_FinalizaEncuesta">
+                <input type="hidden" id="N_PregNoIncluyeEmisionBoleto" name="N_PregNoIncluyeEmisionBoleto" value="@ViewBag.N_PregNoIncluyeEmisionBoleto">
+                <input type="hidden" id="N_PregComentario" name="N_PregComentario" value="@ViewBag.N_PregComentario">
+                <input type="hidden" id="N_PregComentarioObligatorio" name="N_PregComentarioObligatorio" value="@ViewBag.N_PregComentarioObligatorio">
+                <input type="hidden" id="N_PregSecuencia" name="N_PregSecuencia" value="@ViewBag.N_PregSecuencia">
+                @*<input type="hidden" id="N_PregAnterior" name="N_PregAnterior" value="@ViewBag.N_PregAnterior">
+                <input type="hidden" id="N_PregSiguiente" name="N_PregObligatoria" value="@ViewBag.N_PregSiguiente">*@
+            </div>
+        </div>
+    </div>
+    <hr style="padding-top:0px;margin-top:0px;" />
+    <div class="row">
+        @if (ViewBag.ID_TipoPregunta == 4)
+        {
+            <div class="col-md-4">
+                <label for="cbo_TipoLikert" style="font-weight:normal;">Tipo Likert</label>
+                <select id="cbo_TipoLikert" name="cbo_TipoLikert" class="form-control">
+                    @foreach (var item in ViewBag.Tipo_Likert as List<T_TipoLikert>)
+                    {
+                        if (ViewBag.ID_TipoLikert == item.ID_TipoLikert)
+                        {
+                            <option value=@item.ID_TipoLikert selected>@item.C_TipoLikert</option>
+                        }
+                        else
+                        {
+                            <option value=@item.ID_TipoLikert>@item.C_TipoLikert</option>
+                        }
+                    }
+                </select>
+            </div>
+        }
+        <div class="col-md-4">
+            <div class="form-check">
+                @if (ViewBag.N_PregEmisionBoleto == true)
+                {
+                    <input type="checkbox" class="form-check-input" id="nEsEmisionBoleto" name="nEsEmisionBoleto" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nEsEmisionBoleto" name="nEsEmisionBoleto" value=false>
+                }
+                <label class="form-check-label" for="nEsEmisionBoleto" style="font-weight:normal;">Es Emisión Boleto?</label>
+            </div>
+        </div>
+        @*<div class="col-md-4">
+            <div class="form-check">
+                @if (ViewBag.N_FinalizaEncuesta == true)
+                {
+                    <input type="checkbox" class="form-check-input" id="nFinalizaEncuesta" name="nFinalizaEncuesta" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nFinalizaEncuesta" name="nFinalizaEncuesta" value=false>
+                }
+                <label class="form-check-label" for="nEsExcluyente" style="font-weight:normal;">Finaliza Encuenta?</label>
+            </div>
+        </div>*@
+        <div class="col-md-4">
+            <div class="form-check">
+                @if (ViewBag.N_PregNoIncluyeEmisionBoleto == true)
+                {
+                    <input type="checkbox" class="form-check-input" id="nNoIncluyeEmisionBoleto" name="nNoIncluyeEmisionBoleto" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nNoIncluyeEmisionBoleto" name="nNoIncluyeEmisionBoleto" value=false>
+                }
+                <label class="form-check-label" for="nNoIncluyeEmisionBoleto" style="font-weight:normal;">No incluye EmisionBoleto?</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check">
+                @if (ViewBag.N_PregComentario == 1)
+                {
+                    <input type="checkbox" class="form-check-input" id="nIncluyeComentario" name="nIncluyeComentario" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nIncluyeComentario" name="nIncluyeComentario" value=false>
+                }
+                <label class="form-check-label" for="nIncluyeComentario" style="font-weight:normal;">Ingresa comentario?</label>
+            </div>
+        </div>
+        
+        <div class="col-md-4" id="ComObliga">
+            <div class="form-check">
+                @if (ViewBag.N_PregComentarioObligatorio == true)
+                {
+                    <input type="checkbox" class="form-check-input" id="nComentarioObligatorio" name="nComentarioObligatorio" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nComentarioObligatorio" name="nComentarioObligatorio" value=false>
+                }
+                <label class="form-check-label" for="nComentarioObligatorio" style="font-weight:normal;">Comentario Obligatorio?</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check">
+                @if (ViewBag.N_PregSecuencia == 1)
+                {
+                    <input type="checkbox" class="form-check-input" id="nTieneSecuencia" name="nTieneSecuencia" checked value=true>
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="nTieneSecuencia" name="nTieneSecuencia" value=false>
+                }
+                <label class="form-check-label" for="nTieneSecuencia" style="font-weight:normal;">Ingresa Secuencia?</label>
+            </div>
+        </div>
+        <div class="col-md-4 form-inline">
+
+        </div>
+    </div>
+    <br />
+    <div class="row" id="Secuencia">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label for="N_PregAnterior" style="font-weight:normal;">Al seleccionar atrás ir a la pregunta: &nbsp;&nbsp;</label>
+                <input type="text" class="form-control" id="N_PregAnterior" name="N_PregAnterior" value='@ViewBag.N_PregAnterior'>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                <label for="N_PregSiguiente" style="font-weight:normal;">Al seleccionar siguiente ir a la pregunta: &nbsp;&nbsp;</label>
+                <input type="text" class="form-control" id="N_PregSiguiente" name="N_PregSiguiente" value='@ViewBag.N_PregSiguiente'>
+            </div>
+        </div>
+    </div>
+</div>

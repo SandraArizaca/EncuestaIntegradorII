@@ -1,0 +1,397 @@
+﻿@model IEnumerable<encuesta.Models.T_Config_Cuestionario>
+@{
+    Layout = null;
+}
+
+<link href="~/Content/jquery-sortable.css" rel="stylesheet" />
+<link href="~/Content/vendor.css" rel="stylesheet" />
+
+<script type="text/javascript">
+    /* SWITCH PUBLIC CLASS DEFINITION
+        * ============================== */
+    /*debugger;*/
+    var Switch = function (element, options) {
+        this.init(element, options)
+    }
+
+    Switch.prototype = {
+
+        constructor: Switch
+
+        , init: function (element, options) {
+            this.$element = $(element)
+            this.options = $.extend({}, $.fn.switchbtn.defaults, options)
+
+            this.addChildren()
+
+            this.$element.on('click.switch.data-api', $.proxy(this.toggle, this))
+        }
+
+        , toggle: function (e) {
+            var $el = this.$element
+                , disabled = 'disabled'
+                , active = 'active'
+
+            if ($el.attr(disabled) || $el.hasClass(disabled)) return
+
+            $el.toggleClass(active)
+            this.$checkbox && this.$checkbox.attr('checked', $el.hasClass(active))
+        }
+
+        , addChildren: function () {
+            var $el = this.$element
+                , options = this.options
+
+            $el.empty()
+
+            this.$checkbox = options.checkbox
+                && $('<input type="checkbox"/>')
+                    .attr('name', options.checkbox)
+                    .attr('checked', $el.hasClass('active'))
+                    .appendTo($el)
+
+            $('<span/>')
+                .addClass('switch-track')
+                .appendTo($el)
+            $('<span/>').addClass('switch-thumb')
+                .attr('data-on', options.on)
+                .attr('data-off', options.off)
+                .appendTo($el)
+        }
+
+    }
+
+
+    /* SWITCH PLUGIN DEFINITION
+        * ======================== */
+
+    // IE8- incorrectly treat the 'switch' in '$.fn.switch' as a reserved word so we'll use '$.fn.switchbtn' instead
+    $.fn.switchbtn = function (option) {
+        /*debugger;*/
+        return this.each(function () {
+            var $this = $(this)
+                , data = $this.data('switch')
+                , options = typeof option == 'object' && option
+            data || $this.data('switch', (data = new Switch(this, options)))
+            option == 'toggle' && data.toggle()
+        })
+    }
+
+    $.fn.switchbtn.defaults = {
+        on: 'ON'
+        , off: 'OFF'
+        , checkbox: false
+    }
+
+    $.fn.switchbtn.Constructor = Switch
+
+
+    /* SWITCH DATA-API
+        * =============== */
+    /*debugger;*/
+    $('[data-toggle="switch"]').each(function () {
+        var $switch = $(this)
+        $switch.switchbtn($switch.data())
+    })
+
+    var oldContainer;
+    $("div.nested_with_switch").sortable({
+        group: 'nested',
+        afterMove: function (placeholder, container) {
+            /*debugger;*/
+            if (oldContainer != container) {
+                if (oldContainer)
+                    oldContainer.el.removeClass("active");
+                container.el.addClass("active");
+
+                oldContainer = container;
+            }
+        },
+        onDrop: function ($item, container, _super) {
+            /*debugger;*/
+            container.el.removeClass("active");
+            _super($item, container);
+        }
+    });
+
+    $(".switch-container").on("click", ".switch", function (e) {
+        /*debugger;*/
+        var method = $(this).hasClass("active") ? "enable" : "disable";
+        var seccion = 0;
+        var ordenSec = 0;
+        var ordenPreg = 0;
+        var cConfiguracion = { 'T_ConfiguracionOrden': [] }
+        if (method == "disable") {
+            $("div.nested_with_switch div.span4").each(function () {
+                var pregunta = 0;
+                var ordenAlter = 0;
+                var div = $(this).attr('id');
+                var cuestionario = $(this).attr('name');
+                seccion = div.substring(4, div.length);
+                ordenSec = ordenSec + 1;
+                $("#" + div + " tr.ui-sortable-handle").each(function () {
+                    var alternativa = 0;
+                    var row = $(this).attr('id');
+                    var prefi = row.substring(0, 1);
+
+                    if (prefi == "P") {
+                        ordenAlter = 0;
+                        pregunta = row.substring(2, div.length);
+                        ordenPreg = ordenPreg + 1;
+                    } else {
+                        alternativa = $(this).attr('id');
+                        ordenAlter = ordenAlter + 1;
+                    }
+                    cConfiguracion.T_ConfiguracionOrden.push({ ID_Cuestionario: cuestionario, ID_Seccion: seccion, OrdenSec: ordenSec, ID_Pregunta: pregunta, OrdenPreg: ordenPreg, ID_Alternativa: alternativa, OrdenAlter: ordenAlter, });
+                });
+            });
+            $.ajax({
+                type: "POST",
+                url: '/Cuestionario/Registra_orden',
+                data: { pConfiguracionOrden: cConfiguracion.T_ConfiguracionOrden },
+                dataType: "json",
+                async: false,
+                beforeSend: function () { },
+                success: function (data) {
+                    $.each(data, function (key, registro) {
+                        $("#m_configuracion").load("/Cuestionario/Configuracion_datos", { pCuestionario: registro.ID_Cuestionario }, function (data) { });
+                        method = $('.switch').hasClass("active") ? "enable" : "disable";
+                    });
+                }
+            });
+        }
+        //$(e.delegateTarget).next().sortable(method);
+        //var cancel = $(e.delegateTarget).next().sortable();
+        $(e.delegateTarget).next().sortable(method);
+        $('.sorted_table').sortable(method)
+    });
+    //});
+
+    //$(function () {
+    // Sortable rows
+    /*debugger;*/
+    $('.sorted_table').sortable({
+        containerSelector: 'table',
+        itemPath: '> tbody',
+        itemSelector: 'tr',
+        placeholder: '<tr class="placeholder"/>'
+    });
+
+    // Sortable column heads
+    var oldIndex;
+    $('.sorted_head tr').sortable({
+        containerSelector: 'tr',
+        itemSelector: 'th',
+        placeholder: '<th class="placeholder"/>',
+        vertical: false,
+        onDragStart: function ($item, container, _super) {
+            oldIndex = $item.index();
+            $item.appendTo($item.parent());
+            _super($item, container);
+        },
+        onDrop: function ($item, container, _super) {
+            var field,
+                newIndex = $item.index();
+
+            if (newIndex != oldIndex) {
+                $item.closest('table').find('tbody tr').each(function (i, row) {
+                    row = $(row);
+                    if (newIndex < oldIndex) {
+                        row.children().eq(newIndex).before(row.children()[oldIndex]);
+                    } else if (newIndex > oldIndex) {
+                        row.children().eq(newIndex).after(row.children()[oldIndex]);
+                    }
+                });
+            }
+
+            _super($item, container);
+        }
+    });
+
+    $('div.nested_with_switch').sortable();
+    //});
+
+</script>
+
+@*<div id="draggable" ondrop="drop(event)" ondragover="allowDrop(event)" class="panel panel-default">*@
+<div class="span4">
+    <div class="switch-container">
+        <div class="switch active" data-off="OFF" data-on="ON" data-toggle="switch">
+            <span class="switch-track"></span>
+            <span class="switch-thumb" data-on="ON" data-off="OFF"></span>
+        </div>
+    </div>
+    @*<ol class="nested_with_switch vertical" >*@
+    <div class="nested_with_switch vertical">
+        @{int nSeccion = 0;
+            int nPregunta = 0;
+        }
+        @foreach (var item in Model)
+        {
+            if (item.ID_Pregunta == 0)
+            {
+                nSeccion = item.ID_Seccion;
+                @*<li id="div_@item.ID_Seccion">@item.T_Seccion.C_Seccion</li>*@
+                <div class="span4" id="div_@item.ID_Seccion" name="@item.ID_Cuestionario">
+                    <div class="col-md-6">
+                        <h2 class="panel-title" style="padding-top:10px;">@item.T_Seccion.C_Seccion</h2>
+                    </div>
+                    <div id="div_@item.ID_Seccion">
+                        <table id="tbl_@item.ID_Seccion" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center m_nb" style="width:100px;" hidden>ID</th>
+                                    <th class="text-center m_nb" style="width:100px;">ORDEN</th>
+                                    <th class="m_nb">Pregunta</th>
+                                    <th class="text-center m_nb" style="width:100px;">Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sorted_table">
+                                @foreach (var item2 in Model)
+                                {
+                                    if (item2.ID_Pregunta != 0 && nSeccion == item2.ID_Seccion && item2.ID_Alternativa == 0)
+                                    {
+                                        if (nPregunta != item2.ID_Pregunta)
+                                        {
+                                            nPregunta = item2.ID_Pregunta;
+                                            <tr id="P_@item2.ID_Pregunta">
+                                                <td class="text-center" hidden>
+                                                    @item2.ID_Pregunta
+                                                </td>
+                                                <td class="text-center">
+                                                    @item2.N_OrdenPreg
+                                                </td>
+                                                <td>
+                                                    @item2.T_Pregunta.C_Pregunta
+                                                </td>
+                                                <td>
+                                                    @item2.T_Pregunta.T_TipoPregunta.C_TipoPregunta
+                                                </td>
+                                                <td style="width:100px;">
+                                                    <a href="#" onclick="load_configurarPregunta('@item2.ID_Cuestionario','@item2.ID_Seccion','@item2.ID_Pregunta');">Configurar</a>
+                                                </td>
+                                                <td>
+                                                    <table id="tblP_@item2.ID_Pregunta" class="table table-striped table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center m_nb" style="width:100px;">ORDEN</th>
+                                                                <th class="m_nb">Alternativa</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="sorted_table">
+                                                            @foreach (var item3 in Model)
+                                                            {
+                                                                if (nSeccion == item3.ID_Seccion && nPregunta == item3.ID_Pregunta && item3.ID_Alternativa != 0)
+                                                                {
+                                                                    <tr id="@item3.ID_Alternativa">
+                                                                        <td class="text-center">
+                                                                            @item3.T_Alternativa.N_Orden
+                                                                        </td>
+                                                                        <td>
+                                                                            @item3.T_Alternativa.C_Alternativa
+                                                                        </td>
+                                                                        <td style="width:100px;">
+                                                                            <a href="#" onclick="load_configurarAlternativa('@item2.ID_Cuestionario','@item2.ID_Seccion','@item3.ID_Pregunta','@item3.ID_Alternativa');">Configurar</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@* modal: configurar pregunta*@
+@using (Html.BeginForm("Configuracion", "Pregunta", FormMethod.Post, new { id = "mform" }))
+{
+    <div class="modal fade" id="mod_confiPreg" name="mod_confiPreg" tabindex="-1" role="dialog" aria-labelledby="mod_edit" aria-hidden="true" data-keyboard=”false”>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <!---->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Configurar Pregunta</h4>
+                </div>
+                <!---->
+                <div class="modal-body">
+                    <div id="m_confiPreg">
+
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <button type="submit" id="btn_update" name="btn_update" class="btn btn-primary">Actualizar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* modal: configurar alternativa*@
+@using (Html.BeginForm("ConfiguracionAlternativa", "Pregunta", FormMethod.Post, new { id = "mform" }))
+{
+    <div class="modal fade" id="mod_confi" name="mod_confi" tabindex="-1" role="dialog" aria-labelledby="mod_edit" aria-hidden="true" data-keyboard=”false”>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <!---->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Configurar Alternativa</h4>
+                </div>
+                <!---->
+                <div class="modal-body">
+                    <div id="m_confi">
+
+                    </div>
+                </div>
+                <!---->
+                <div class="modal-footer">
+                    <div class="text-right">
+                        <button type="submit" id="btn_update" name="btn_update" class="btn btn-primary">Actualizar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function load_configurarPregunta(nIDCuestionario, nIDSeccion, nIDPregunta) {
+        /*debugger;*/
+        $("#mAjax").show();
+        $("#m_confiPreg").load("/Cuestionario/ConfPregunta_edit", { ID_Cuestionario: nIDCuestionario, ID_Seccion: nIDSeccion, ID_Pregunta: nIDPregunta }, function (data) {
+            $("#mAjax").hide();
+            $('#mod_confiPreg').modal('show');
+        });
+    };
+
+    function load_configurarAlternativa(nIDCuestionario, nIDSeccion, nIDPregunta, nIDAlternativa) {
+        /*debugger;*/
+        $("#mAjax").show();
+        $("#m_confi").load("/Cuestionario/ConfAlternativa_edit", { ID_Cuestionario: nIDCuestionario, ID_Seccion: nIDSeccion, ID_Pregunta: nIDPregunta, ID_Alternativa: nIDAlternativa}, function (data) {
+            $("#mAjax").hide();
+            $('#mod_confi').modal('show');
+        });
+    };
+</script>
+
+

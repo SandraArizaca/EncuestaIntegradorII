@@ -1,0 +1,46 @@
+﻿@model IEnumerable<encuesta.Models.T_Config_Cuestionario>
+@{
+    Layout = null;
+}
+<script>
+    $('#tbl2').DataTable({
+        responsive: true,
+        "lengthMenu": [[20, 40, -1], [20, 40, "All"]]
+    });
+</script>
+
+<table id="tbl2" class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th class="m_nb">Orden</th>
+            <th class="m_nb">Sección</th>
+            <th class="m_nb text-center">Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.ID_Pregunta == 0)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.N_OrdenSeccion)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.T_Seccion.C_Seccion)
+                    </td>
+                    <td class="text-center" style="width:100px;">
+                        <a href="#" onclick="load_deleteSec(@Html.DisplayFor(modelItem => item.ID_Cuestionario), @Html.DisplayFor(modelItem => item.ID_Seccion), @Html.DisplayFor(modelItem => item.N_OrdenSeccion));">Desasignar</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<script>
+    function load_deleteSec(nIDCuestionario, nIDSeccion, nOrden) {
+        $.post("/Cuestionario/_deleteConfigSeccion", { pCuestionario: nIDCuestionario, pSeccion: nIDSeccion, pCant: nSecciones, pOrden: nOrden }, function () {
+            $("#m_secciones").load("/Cuestionario/ConfiguraSecciones", { ID_Cuestionario: nCuestionario }, function () { });
+        });
+    };
+</script>
